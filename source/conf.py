@@ -4,6 +4,7 @@
 import os
 import pathlib
 import sys
+from urllib.parse import urlparse
 
 _ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.append(os.fspath(_ROOT))
@@ -12,9 +13,10 @@ sys.path.append(os.fspath(_ROOT))
 RTD_BUILD = bool(os.getenv("READTHEDOCS"))
 RTD_PR_BUILD = RTD_BUILD and os.getenv("READTHEDOCS_VERSION_TYPE") == "external"
 RTD_URL = os.getenv("READTHEDOCS_CANONICAL_URL")
-RTD_CANONICAL_BUILD = (
-    RTD_BUILD and not RTD_PR_BUILD and "packaging.python.org" in RTD_URL
-)
+RTD_CANONICAL_BUILD = False
+if RTD_BUILD and not RTD_PR_BUILD and RTD_URL:
+    parsed_url = urlparse(RTD_URL)
+    RTD_CANONICAL_BUILD = parsed_url.hostname == "packaging.python.org"
 
 project = "Python Packaging User Guide"
 
